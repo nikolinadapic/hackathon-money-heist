@@ -1,19 +1,24 @@
 package com.ag04.sbss.hackathon.app.services;
 
+import com.ag04.sbss.hackathon.app.converters.RequiredSkillListFormToRequiredSkillSet;
+import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
+import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.model.Heist;
+import com.ag04.sbss.hackathon.app.model.StatusHeist;
 import com.ag04.sbss.hackathon.app.repositories.HeistRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class HeistServiceImpl implements HeistService {
 
     private final HeistRepository heistRepository;
+    private final RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet;
 
-    public HeistServiceImpl(HeistRepository heistRepository) {
+    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet) {
         this.heistRepository = heistRepository;
+        this.requiredSkillListFormToRequiredSkillSet = requiredSkillListFormToRequiredSkillSet;
     }
 
     @Override
@@ -29,5 +34,22 @@ public class HeistServiceImpl implements HeistService {
         }
 
         heistRepository.save(heist);
+    }
+
+    @Override
+    public void updateHeistSkills(Long id, RequiredSkillListForm requiredSkillListForm) {
+        Optional<Heist> heistOptional = heistRepository.findById(id);
+
+        if(heistOptional.isEmpty()) {
+            throw new RuntimeException("Heist with given ID does not exist.");
+        }
+
+        if(heistOptional.get().getStatus().equals(StatusHeist.IN_PROGRESS) || heistOptional.get().getStatus().equals(StatusHeist.FINISHED)) {
+            throw new RuntimeException("Heist has already started.");
+        }
+
+        heistOptional.get().setSkills(requiredSkillListFormToRequiredSkillSet.convert(requiredSkillListForm));
+
+        heistRepository.save(heistOptional.get());
     }
 }
