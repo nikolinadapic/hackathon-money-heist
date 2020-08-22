@@ -7,4 +7,6 @@ public interface HeistService {
     public void addHeist(Heist heist);
 
     public void updateHeistSkills(Long id, RequiredSkillListForm requiredSkillListForm);
+
+    public void startHeist(Long id);
 }

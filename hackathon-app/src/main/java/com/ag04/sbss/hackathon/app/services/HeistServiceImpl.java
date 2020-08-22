@@ -1,7 +1,6 @@
 package com.ag04.sbss.hackathon.app.services;
 
 import com.ag04.sbss.hackathon.app.converters.RequiredSkillListFormToRequiredSkillSet;
-import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.model.Heist;
 import com.ag04.sbss.hackathon.app.model.StatusHeist;
@@ -49,6 +48,23 @@ public class HeistServiceImpl implements HeistService {
         }
 
         heistOptional.get().setSkills(requiredSkillListFormToRequiredSkillSet.convert(requiredSkillListForm));
+
+        heistRepository.save(heistOptional.get());
+    }
+
+    @Override
+    public void startHeist(Long id) {
+        Optional<Heist> heistOptional = heistRepository.findById(id);
+
+        if (heistOptional.isEmpty()) {
+            throw new RuntimeException("Heist with given ID does not exist.");
+        }
+
+        if (!heistOptional.get().getStatus().equals(StatusHeist.READY)) {
+            throw new RuntimeException("Heist is not ready.");
+        }
+
+        heistOptional.get().setStatus(StatusHeist.IN_PROGRESS);
 
         heistRepository.save(heistOptional.get());
     }
