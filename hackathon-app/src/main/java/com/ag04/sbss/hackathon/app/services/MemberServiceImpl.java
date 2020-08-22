@@ -61,6 +61,7 @@ public class MemberServiceImpl implements MemberService {
             } else if (skills.getSkills() != null && skills.getMainSkill() != null) {
                 checkIfMainSkillPresent(skills.getSkills(), skills.getMainSkill(), member);
             }
+            skillRepository.deleteAll();
             memberRepository.save(member);
         }
     }
