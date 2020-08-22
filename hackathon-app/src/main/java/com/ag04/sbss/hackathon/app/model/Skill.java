@@ -11,9 +11,6 @@ import javax.persistence.*;
 @Table(name="skill")
 public class Skill {
 
-    public Skill(String name){
-        this.name = name;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
