@@ -7,6 +7,7 @@ import com.ag04.sbss.hackathon.app.converters.RequiredSkillToRequiredSkillForm;
 import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistDTO;
+import com.ag04.sbss.hackathon.app.dto.StatusDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
@@ -195,6 +196,17 @@ public class HeistServiceImpl implements HeistService {
         }
 
         return requiredSkillForms;
+    }
+
+    @Override
+    public StatusDTO findHeistStatus(Long heistId) {
+        Optional<Heist> heistOptional = heistRepository.findById(heistId);
+
+        if (heistOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Heist with given ID does not exist.");
+        }
+
+        return new StatusDTO(heistOptional.get().getStatus());
     }
 
     boolean isEligible(Member member, Heist heist) {
