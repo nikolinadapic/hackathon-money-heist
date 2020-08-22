@@ -3,10 +3,12 @@ package com.ag04.sbss.hackathon.app.services;
 import com.ag04.sbss.hackathon.app.converters.HeistToHeistDTO;
 import com.ag04.sbss.hackathon.app.converters.MemberToHeistMemberDTO;
 import com.ag04.sbss.hackathon.app.converters.RequiredSkillListFormToRequiredSkillSet;
+import com.ag04.sbss.hackathon.app.converters.RequiredSkillToRequiredSkillForm;
 import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
+import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.model.*;
 import com.ag04.sbss.hackathon.app.repositories.HeistRepository;
@@ -27,14 +29,16 @@ public class HeistServiceImpl implements HeistService {
     private final MemberRepository memberRepository;
     private final MemberToHeistMemberDTO memberToHeistMemberDTO;
     private final HeistToHeistDTO heistToHeistDTO;
+    private final RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm;
 
-    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO) {
+    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm) {
         this.heistRepository = heistRepository;
         this.requiredSkillListFormToRequiredSkillSet = requiredSkillListFormToRequiredSkillSet;
         this.requiredSkillService = requiredSkillService;
         this.memberRepository = memberRepository;
         this.memberToHeistMemberDTO = memberToHeistMemberDTO;
         this.heistToHeistDTO = heistToHeistDTO;
+        this.requiredSkillToRequiredSkillForm = requiredSkillToRequiredSkillForm;
     }
 
     @Override
@@ -94,6 +98,10 @@ public class HeistServiceImpl implements HeistService {
             throw new ResourceNotFoundException("Heist with given ID does not exist.");
         }
 
+        if(!heistOptional.get().getStatus().equals(StatusHeist.PLANNING)) {
+            throw new MethodNotAllowedException("Heist is already planned.");
+        }
+
         EligibleMembersDTO eligibleMembersDTO = new EligibleMembersDTO();
         eligibleMembersDTO.setSkills(requiredSkillService.convertToSkillFormList(heistOptional.get().getSkills()));
 
@@ -138,6 +146,7 @@ public class HeistServiceImpl implements HeistService {
         }
 
         heistOptional.get().setMembers(members);
+        heistOptional.get().setStatus(StatusHeist.READY);
         heistRepository.save(heistOptional.get());
     }
 
@@ -148,6 +157,44 @@ public class HeistServiceImpl implements HeistService {
             throw new ResourceNotFoundException("Heist with given ID does not exist.");
         }
         return heistToHeistDTO.convert(heistOptional.get());
+    }
+
+    @Override
+    public List<HeistMemberDTO> findHeistMembers(Long heistId) {
+        Optional<Heist> heistOptional = heistRepository.findById(heistId);
+
+        if (heistOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Heist with given ID does not exist.");
+        }
+
+        if(heistOptional.get().getStatus().equals(StatusHeist.PLANNING)) {
+            throw new MethodNotAllowedException("Heist status is PLANNING.");
+        }
+
+        List<HeistMemberDTO> heistMemberDTOList = new LinkedList<>();
+
+        for(Member member : heistOptional.get().getMembers()) {
+            heistMemberDTOList.add(memberToHeistMemberDTO.convert(member));
+        }
+
+        return heistMemberDTOList;
+    }
+
+    @Override
+    public List<RequiredSkillForm> findHeistSkills(Long heistId) {
+        Optional<Heist> heistOptional = heistRepository.findById(heistId);
+
+        if (heistOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Heist with given ID does not exist.");
+        }
+
+        List<RequiredSkillForm> requiredSkillForms = new LinkedList<>();
+
+        for(RequiredSkill skill : heistOptional.get().getSkills()) {
+            requiredSkillForms.add(requiredSkillToRequiredSkillForm.convert(skill));
+        }
+
+        return requiredSkillForms;
     }
 
     boolean isEligible(Member member, Heist heist) {

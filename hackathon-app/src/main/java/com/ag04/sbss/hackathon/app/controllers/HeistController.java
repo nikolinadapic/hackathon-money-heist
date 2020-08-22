@@ -3,6 +3,7 @@ package com.ag04.sbss.hackathon.app.controllers;
 import com.ag04.sbss.hackathon.app.converters.HeistFormToHeist;
 import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistDTO;
+import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
 import com.ag04.sbss.hackathon.app.forms.HeistForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
@@ -68,5 +69,15 @@ public class HeistController {
     @GetMapping("/{heistId}")
     public ResponseEntity<HeistDTO> getHeist(@PathVariable("heistId") Long heistId) {
         return new ResponseEntity<>(heistService.findById(heistId), HttpStatus.OK);
+    }
+
+    @GetMapping("/{heistId}/members")
+    public ResponseEntity<List<HeistMemberDTO>> getHeistMembers(@PathVariable("heistId") Long heistId) {
+        return new ResponseEntity<>(heistService.findHeistMembers(heistId), HttpStatus.OK);
+    }
+
+    @GetMapping("/{heistId}/skills")
+    public ResponseEntity<List<RequiredSkillForm>> getHeistSkills(@PathVariable("heistId") Long heistId) {
+        return new ResponseEntity<>(heistService.findHeistSkills(heistId), HttpStatus.OK);
     }
 }

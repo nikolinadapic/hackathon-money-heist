@@ -2,10 +2,13 @@ package com.ag04.sbss.hackathon.app.services;
 
 import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistDTO;
+import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
+import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.model.Heist;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface HeistService {
@@ -20,4 +23,8 @@ public interface HeistService {
     public void addHeistMembers(Long id, MemberNamesForm memberNames);
 
     public HeistDTO findById(Long id);
+
+    List<HeistMemberDTO> findHeistMembers(Long heistId);
+
+    List<RequiredSkillForm> findHeistSkills(Long heistId);
 }
