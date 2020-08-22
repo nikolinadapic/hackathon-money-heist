@@ -32,6 +32,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private StatusMember status;
 
+    @ManyToMany(mappedBy = "members")
+    private Set<Heist> heists;
+
     public void setSkills(Set<MemberSkill> skills) {
         this.skills = skills;
 

@@ -8,4 +8,5 @@ import java.util.Set;
 
 public interface RequiredSkillService {
     Set<RequiredSkill> convertToSkillSet(List<RequiredSkillForm> forms);
+    List<RequiredSkillForm> convertToSkillFormList(Set<RequiredSkill> skills);
 }

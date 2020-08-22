@@ -28,6 +28,12 @@ public class Heist {
     @Enumerated(EnumType.STRING)
     private StatusHeist status;
 
+    @ManyToMany
+    @JoinTable(name = "heist_member",
+            joinColumns = @JoinColumn(name = "heist_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id"))
+    private Set<Member> members;
+
     public void setSkills(Set<RequiredSkill> skills) {
         this.skills = skills;
 

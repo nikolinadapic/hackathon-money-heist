@@ -1,12 +1,14 @@
 package com.ag04.sbss.hackathon.app.converters;
 
-import com.ag04.sbss.hackathon.app.converters.MemberSkillFormToMemberSkill;
 import com.ag04.sbss.hackathon.app.forms.MemberForm;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
 import com.ag04.sbss.hackathon.app.model.Skill;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
 import com.ag04.sbss.hackathon.app.repositories.SkillRepository;
+import com.ag04.sbss.hackathon.app.services.MemberSkillService;
+import com.sun.istack.Nullable;
+import lombok.Synchronized;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -17,15 +19,19 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
     private MemberRepository memberRepository;
     private SkillRepository skillRepository;
     private MemberSkillFormToMemberSkill skillConverter;
+    private final MemberSkillService memberSkillService;
 
     public MemberFormToMember(MemberRepository memberRepository,
                               MemberSkillFormToMemberSkill skillConverter,
-                              SkillRepository skillRepository) {
+                              SkillRepository skillRepository, MemberSkillService memberSkillService) {
         this.memberRepository = memberRepository;
         this.skillConverter = skillConverter;
         this.skillRepository = skillRepository;
+        this.memberSkillService = memberSkillService;
     }
 
+    @Synchronized
+    @Nullable
     @Override
     public Member convert(MemberForm source) {
         Member converted = new Member();
@@ -40,10 +46,8 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
             converted.setSex(source.getSex());
             converted.setStatus(source.getStatus());
             //convert skill forms to skills
-            source.getSkills().forEach(
-                    //fetch the one with the id!!!
-                    memberSkillForm ->  converted.getSkills().add(skillConverter.convert(memberSkillForm))
-            );
+            converted.setSkills(memberSkillService.convertToSkillSet(source.getSkills()));
+
             //check if the main skill exists in the skills set
             if(source.getMainSkill()!= null){
                 String mainSkillName = source.getMainSkill();

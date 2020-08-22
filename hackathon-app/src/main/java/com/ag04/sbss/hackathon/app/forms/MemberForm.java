@@ -11,7 +11,7 @@ import lombok.Setter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by Vitomir M on 22.8.2020.
@@ -31,7 +31,7 @@ public class MemberForm {
         private String email;
 
         @NotNull
-        private Set<MemberSkillForm> skills;
+        private List<MemberSkillForm> skills;
 
         private String mainSkill;
 
