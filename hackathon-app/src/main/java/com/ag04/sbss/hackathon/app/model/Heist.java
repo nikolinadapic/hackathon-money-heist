@@ -1,6 +1,7 @@
 package com.ag04.sbss.hackathon.app.model;
 
 import lombok.Data;
+import org.aspectj.apache.bcel.classfile.Module;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -26,4 +27,12 @@ public class Heist {
 
     @Enumerated(EnumType.STRING)
     private StatusHeist status;
+
+    public void setSkills(Set<RequiredSkill> skills) {
+        this.skills = skills;
+
+        for(RequiredSkill skill : skills) {
+            skill.setHeist(this);
+        }
+    }
 }

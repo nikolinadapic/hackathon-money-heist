@@ -5,6 +5,8 @@ import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.model.Heist;
 import com.ag04.sbss.hackathon.app.model.StatusHeist;
 import com.ag04.sbss.hackathon.app.repositories.HeistRepository;
+import com.ag04.sbss.hackathon.app.services.exception.MethodNotAllowedException;
+import com.ag04.sbss.hackathon.app.services.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,11 +27,11 @@ public class HeistServiceImpl implements HeistService {
         Optional<Heist> heistOptional = heistRepository.findByName(heist.getName());
 
         if(heistOptional.isPresent()) {
-            throw new RuntimeException("Heist with name " + heist.getName() + " already exists");
+            throw new MethodNotAllowedException("Heist with name " + heist.getName() + " already exists");
         }
 
         if(heist.getStartTime().after(heist.getEndTime()) || heist.getEndTime().before(new Date(System.currentTimeMillis()))) {
-            throw new RuntimeException("Invalid date.");
+            throw new MethodNotAllowedException("Invalid date.");
         }
 
         heistRepository.save(heist);
@@ -40,11 +42,11 @@ public class HeistServiceImpl implements HeistService {
         Optional<Heist> heistOptional = heistRepository.findById(id);
 
         if(heistOptional.isEmpty()) {
-            throw new RuntimeException("Heist with given ID does not exist.");
+            throw new ResourceNotFoundException("Heist with given ID does not exist.");
         }
 
         if(heistOptional.get().getStatus().equals(StatusHeist.IN_PROGRESS) || heistOptional.get().getStatus().equals(StatusHeist.FINISHED)) {
-            throw new RuntimeException("Heist has already started.");
+            throw new MethodNotAllowedException("Heist has already started.");
         }
 
         heistOptional.get().setSkills(requiredSkillListFormToRequiredSkillSet.convert(requiredSkillListForm));
@@ -57,11 +59,11 @@ public class HeistServiceImpl implements HeistService {
         Optional<Heist> heistOptional = heistRepository.findById(id);
 
         if (heistOptional.isEmpty()) {
-            throw new RuntimeException("Heist with given ID does not exist.");
+            throw new ResourceNotFoundException("Heist with given ID does not exist.");
         }
 
         if (!heistOptional.get().getStatus().equals(StatusHeist.READY)) {
-            throw new RuntimeException("Heist is not ready.");
+            throw new MethodNotAllowedException("Heist is not ready.");
         }
 
         heistOptional.get().setStatus(StatusHeist.IN_PROGRESS);

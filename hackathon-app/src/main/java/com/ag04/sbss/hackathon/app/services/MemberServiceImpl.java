@@ -1,12 +1,10 @@
 package com.ag04.sbss.hackathon.app.services;
 
-import com.ag04.sbss.hackathon.app.converter.MemberFormToMember;
+import com.ag04.sbss.hackathon.app.converters.MemberFormToMember;
 import com.ag04.sbss.hackathon.app.forms.MemberForm;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class MemberServiceImpl implements MemberService {

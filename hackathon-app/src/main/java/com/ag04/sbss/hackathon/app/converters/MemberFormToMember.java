@@ -1,6 +1,6 @@
-package com.ag04.sbss.hackathon.app.converter;
+package com.ag04.sbss.hackathon.app.converters;
 
-
+import com.ag04.sbss.hackathon.app.converters.MemberSkillFormToMemberSkill;
 import com.ag04.sbss.hackathon.app.forms.MemberForm;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
@@ -12,12 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Created by Vitomir M on 22.8.2020.
- */
 @Component
 public class MemberFormToMember implements Converter<MemberForm, Member> {
-
     private MemberRepository memberRepository;
     private SkillRepository skillRepository;
     private MemberSkillFormToMemberSkill skillConverter;
@@ -53,10 +49,10 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
                 String mainSkillName = source.getMainSkill();
                 Optional<Skill> skillOptional =
                         converted.getSkills().stream()
-                        .filter(memberSkill ->
-                                memberSkill.getSkill().getName()
-                                        .equals(mainSkillName))
-                        .findFirst().map(MemberSkill::getSkill);
+                                .filter(memberSkill ->
+                                        memberSkill.getSkill().getName()
+                                                .equals(mainSkillName))
+                                .findFirst().map(MemberSkill::getSkill);
 
                 if(skillOptional.isPresent()){
                     converted.setMainSkill(skillOptional.get());

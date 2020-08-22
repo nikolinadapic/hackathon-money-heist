@@ -1,4 +1,4 @@
-package com.ag04.sbss.hackathon.app.converter;
+package com.ag04.sbss.hackathon.app.converters;
 
 import com.ag04.sbss.hackathon.app.forms.MemberSkillForm;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Created by Vitomir M on 22.8.2020.
- */
 @Component
 public class MemberSkillFormToMemberSkill implements Converter<MemberSkillForm, MemberSkill> {
 

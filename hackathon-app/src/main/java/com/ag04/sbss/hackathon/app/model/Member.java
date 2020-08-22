@@ -31,4 +31,12 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private StatusMember status;
+
+    public void setSkills(Set<MemberSkill> skills) {
+        this.skills = skills;
+
+        for(MemberSkill skill : skills) {
+            skill.setMember(this);
+        }
+    }
 }
