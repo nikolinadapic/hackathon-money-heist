@@ -40,7 +40,16 @@ public class HeistFormToHeist implements Converter<HeistForm, Heist> {
 
         Set<RequiredSkill> skills = new HashSet<>();
         for(RequiredSkillForm skillForm : source.getSkills()) {
-            skills.add(requiredSkillFormToRequiredSkill.convert(skillForm));
+            RequiredSkill requiredSkill = requiredSkillFormToRequiredSkill.convert(skillForm);
+
+            for(RequiredSkill reqSkill : skills) {
+                if(reqSkill.getSkill().getName().equals(requiredSkill.getSkill().getName())
+                    && reqSkill.getLevel().equals(requiredSkill.getLevel())) {
+                    throw new RuntimeException("Cannot add multiple required skills with same name and level.");
+                }
+            }
+
+            skills.add(requiredSkill);
         }
         heist.setSkills(skills);
 
