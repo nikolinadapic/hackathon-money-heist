@@ -1,6 +1,7 @@
 package com.ag04.sbss.hackathon.app.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,13 +18,10 @@ public class Heist {
 
     private String name;
     private String location;
-    private Date startDate;
-    private Date endDate;
+    private Date startTime;
+    private Date endTime;
 
-    @ManyToMany
-    @JoinTable(name = "heist_skill",
-            joinColumns = @JoinColumn(name = "heist_id"),
-            inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "heist")
     private Set<RequiredSkill> skills;
 
     @Enumerated(EnumType.STRING)
