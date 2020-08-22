@@ -9,6 +9,7 @@ import java.util.Set;
 
 @Data
 @Entity
+@Table(name="member_skill")
 public class MemberSkill {
 
     @Id

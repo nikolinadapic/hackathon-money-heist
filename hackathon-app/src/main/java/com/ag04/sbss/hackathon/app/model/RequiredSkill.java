@@ -7,6 +7,7 @@ import java.util.Set;
 
 @Data
 @Entity
+@Table(name="required_skill")
 public class RequiredSkill {
 
     @Id
