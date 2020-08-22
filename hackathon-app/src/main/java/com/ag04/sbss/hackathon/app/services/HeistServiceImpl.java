@@ -1,9 +1,11 @@
 package com.ag04.sbss.hackathon.app.services;
 
+import com.ag04.sbss.hackathon.app.converters.HeistToHeistDTO;
 import com.ag04.sbss.hackathon.app.converters.MemberToHeistMemberDTO;
 import com.ag04.sbss.hackathon.app.converters.RequiredSkillListFormToRequiredSkillSet;
 import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
+import com.ag04.sbss.hackathon.app.dto.HeistDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.model.*;
@@ -24,13 +26,15 @@ public class HeistServiceImpl implements HeistService {
     private final RequiredSkillService requiredSkillService;
     private final MemberRepository memberRepository;
     private final MemberToHeistMemberDTO memberToHeistMemberDTO;
+    private final HeistToHeistDTO heistToHeistDTO;
 
-    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO) {
+    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO) {
         this.heistRepository = heistRepository;
         this.requiredSkillListFormToRequiredSkillSet = requiredSkillListFormToRequiredSkillSet;
         this.requiredSkillService = requiredSkillService;
         this.memberRepository = memberRepository;
         this.memberToHeistMemberDTO = memberToHeistMemberDTO;
+        this.heistToHeistDTO = heistToHeistDTO;
     }
 
     @Override
@@ -135,6 +139,15 @@ public class HeistServiceImpl implements HeistService {
 
         heistOptional.get().setMembers(members);
         heistRepository.save(heistOptional.get());
+    }
+
+    public HeistDTO findById(Long id) {
+        Optional<Heist> heistOptional = heistRepository.findById(id);
+
+        if (heistOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Heist with given ID does not exist.");
+        }
+        return heistToHeistDTO.convert(heistOptional.get());
     }
 
     boolean isEligible(Member member, Heist heist) {
