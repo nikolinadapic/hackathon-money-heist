@@ -1,6 +1,8 @@
 package com.ag04.sbss.hackathon.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -31,6 +33,11 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private StatusMember status;
+
+    @ManyToMany(mappedBy = "members")
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<Heist> heists;
 
     public void setSkills(Set<MemberSkill> skills) {
         this.skills = skills;

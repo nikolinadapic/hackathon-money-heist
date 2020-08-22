@@ -1,6 +1,5 @@
 package com.ag04.sbss.hackathon.app.converters;
 
-import com.ag04.sbss.hackathon.app.converters.MemberSkillFormToMemberSkill;
 import com.ag04.sbss.hackathon.app.forms.MemberForm;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
