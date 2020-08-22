@@ -7,6 +7,7 @@ import com.ag04.sbss.hackathon.app.model.Skill;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
 import com.ag04.sbss.hackathon.app.repositories.SkillRepository;
 import com.ag04.sbss.hackathon.app.services.MemberSkillService;
+import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.sun.istack.Nullable;
 import lombok.Synchronized;
 import org.springframework.core.convert.converter.Converter;
@@ -23,7 +24,8 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
 
     public MemberFormToMember(MemberRepository memberRepository,
                               MemberSkillFormToMemberSkill skillConverter,
-                              SkillRepository skillRepository, MemberSkillService memberSkillService) {
+                              SkillRepository skillRepository,
+                              MemberSkillService memberSkillService) {
         this.memberRepository = memberRepository;
         this.skillConverter = skillConverter;
         this.skillRepository = skillRepository;
@@ -39,15 +41,15 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
         Optional<Member> memberByNameOptional = memberRepository.findByName(source.getName());
         Optional<Member> memberByEmailOptional = memberRepository.findByEmail(source.getEmail());
         if(memberByNameOptional.isPresent() || memberByEmailOptional.isPresent()){
-            throw new RuntimeException("The member already exists");
+            throw new RequestDeniedException("The member already exists");
         } else{
             converted.setName(source.getName());
             converted.setEmail(source.getEmail());
             converted.setSex(source.getSex());
             converted.setStatus(source.getStatus());
             //convert skill forms to skills
-            converted.setSkills(memberSkillService.convertToSkillSet(source.getSkills()));
 
+            converted.setSkills(memberSkillService.convertToSkillSet(source.getSkills()));
             //check if the main skill exists in the skills set
             if(source.getMainSkill()!= null){
                 String mainSkillName = source.getMainSkill();
@@ -61,7 +63,7 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
                 if(skillOptional.isPresent()){
                     converted.setMainSkill(skillOptional.get());
                 } else{
-                    throw new RuntimeException("None of the skills in the list match the main skill");
+                    throw new RequestDeniedException("None of the skills in the list match the main skill");
                 }
             }
             return converted;
