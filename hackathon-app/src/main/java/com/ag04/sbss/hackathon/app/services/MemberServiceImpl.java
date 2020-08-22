@@ -12,6 +12,7 @@ import com.ag04.sbss.hackathon.app.repositories.MemberSkillRepository;
 import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.ag04.sbss.hackathon.app.services.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -61,8 +62,10 @@ public class MemberServiceImpl implements MemberService {
             } else if (skills.getSkills() != null && skills.getMainSkill() != null) {
                 checkIfMainSkillPresent(skills.getSkills(), skills.getMainSkill(), member);
             }
-            skillRepository.deleteAll();
-            memberRepository.save(member);
+            Member updated =memberRepository.save(member);
+            for(MemberSkill skill : updated.getSkills()){
+                System.out.println(skill.getSkill().getName());
+            }
         }
     }
 
