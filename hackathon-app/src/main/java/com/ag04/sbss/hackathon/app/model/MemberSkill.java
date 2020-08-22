@@ -2,10 +2,10 @@ package com.ag04.sbss.hackathon.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
-import java.util.Set;
 
 @Data
 @Entity
@@ -22,7 +22,9 @@ public class MemberSkill {
     @Pattern(regexp = "^[\\*]{1,10}")
     private String level;
 
-    @ManyToMany(mappedBy = "skills")
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     @JsonIgnore
-    private Set<Member> members;
+    @EqualsAndHashCode.Exclude
+    private Member member;
 }

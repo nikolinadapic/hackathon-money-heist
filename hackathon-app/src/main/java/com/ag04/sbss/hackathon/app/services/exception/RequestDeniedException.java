@@ -21,5 +21,4 @@ public class RequestDeniedException extends RuntimeException {
         super(message);
     }
 
-
 }

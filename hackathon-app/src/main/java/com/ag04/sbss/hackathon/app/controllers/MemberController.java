@@ -1,5 +1,6 @@
 package com.ag04.sbss.hackathon.app.controllers;
 
+import com.ag04.sbss.hackathon.app.forms.MemberForm;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.services.MemberService;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class MemberController {
     }
 
     @PostMapping
-    private ResponseEntity<Member> createMember(@RequestBody Member newMember){
+    private ResponseEntity<Member> createMember(@RequestBody MemberForm newMember){
         Member created = memberService.createMember(newMember);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
