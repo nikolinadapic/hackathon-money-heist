@@ -3,6 +3,7 @@ package com.ag04.sbss.hackathon.app.services;
 import com.ag04.sbss.hackathon.app.converters.MemberSkillFormToMemberSkill;
 import com.ag04.sbss.hackathon.app.forms.MemberSkillForm;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
+import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -29,7 +30,7 @@ public class MemberSkillServiceImpl implements MemberSkillService {
 
             for(MemberSkill memSkill : skills){
                 if(memSkill.getSkill().getName().equals(memberSkill.getSkill().getName())) {
-                    throw new RuntimeException("Cannot add multiple member skills with same name.");
+                    throw new RequestDeniedException("Cannot add multiple member skills with same name.");
                 }
             }
             skills.add(memberSkill);

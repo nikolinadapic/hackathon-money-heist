@@ -8,6 +8,7 @@ import com.ag04.sbss.hackathon.app.model.Skill;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
 import com.ag04.sbss.hackathon.app.repositories.SkillRepository;
 import com.ag04.sbss.hackathon.app.services.MemberSkillService;
+import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.sun.istack.Nullable;
 import lombok.Synchronized;
 import org.springframework.core.convert.converter.Converter;
@@ -41,7 +42,7 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
         Optional<Member> memberByNameOptional = memberRepository.findByName(source.getName());
         Optional<Member> memberByEmailOptional = memberRepository.findByEmail(source.getEmail());
         if(memberByNameOptional.isPresent() || memberByEmailOptional.isPresent()){
-            throw new RuntimeException("The member already exists");
+            throw new RequestDeniedException("The member already exists");
         } else{
             converted.setName(source.getName());
             converted.setEmail(source.getEmail());
@@ -63,7 +64,7 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
                 if(skillOptional.isPresent()){
                     converted.setMainSkill(skillOptional.get());
                 } else{
-                    throw new RuntimeException("None of the skills in the list match the main skill");
+                    throw new RequestDeniedException("None of the skills in the list match the main skill");
                 }
             }
             return converted;
