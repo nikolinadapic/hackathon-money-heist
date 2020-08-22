@@ -1,13 +1,14 @@
 package com.ag04.sbss.hackathon.app.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.util.Set;
-import java.util.logging.Level;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name="required_skill")
 public class RequiredSkill {
@@ -26,9 +27,4 @@ public class RequiredSkill {
     private String level;
 
     private Integer members;
-
-    @ManyToMany(mappedBy = "skills")
-    private Set<Heist> heists;
-
-
 }
