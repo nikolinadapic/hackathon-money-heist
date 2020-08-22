@@ -1,6 +1,8 @@
 package com.ag04.sbss.hackathon.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -27,4 +29,9 @@ public class RequiredSkill {
     private String level;
 
     private Integer members;
+
+    @ManyToOne
+    @EqualsAndHashCode.Exclude
+    @JsonIgnore
+    private Heist heist;
 }

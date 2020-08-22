@@ -21,7 +21,7 @@ public class Heist {
     private Date startTime;
     private Date endTime;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "heist")
     private Set<RequiredSkill> skills;
 
     @Enumerated(EnumType.STRING)
