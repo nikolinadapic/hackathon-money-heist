@@ -3,6 +3,7 @@ package com.ag04.sbss.hackathon.app.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -22,11 +23,8 @@ public class Member {
     //unique
     private String email;
 
-    @ManyToMany
-    @JoinTable(name = "member_skill",
-        joinColumns = @JoinColumn(name = "member_id"),
-        inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private Set<MemberSkill> skills;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
+    private Set<MemberSkill> skills = new HashSet<>();
 
     @ManyToOne
     private Skill mainSkill;
