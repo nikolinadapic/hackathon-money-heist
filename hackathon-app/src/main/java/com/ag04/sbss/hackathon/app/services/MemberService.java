@@ -8,4 +8,6 @@ public interface MemberService {
     Member createMember(MemberForm newMember);
 
     void updateMemberSkills(Long memberId, MemberSkillListForm skills);
+
+    void deleteSkill(Long memberId, String skillName);
 }

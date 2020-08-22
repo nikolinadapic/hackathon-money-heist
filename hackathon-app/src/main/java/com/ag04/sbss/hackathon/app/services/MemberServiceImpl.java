@@ -8,6 +8,7 @@ import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
 import com.ag04.sbss.hackathon.app.model.Skill;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
+import com.ag04.sbss.hackathon.app.repositories.MemberSkillRepository;
 import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.ag04.sbss.hackathon.app.services.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,14 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final MemberFormToMember memberConverter;
     private final MemberSkillService memberSkillService;
+    private final MemberSkillRepository skillRepository;
 
 
-    public MemberServiceImpl(MemberRepository memberRepository, MemberFormToMember memberConverter, MemberSkillService memberSkillService) {
+    public MemberServiceImpl(MemberRepository memberRepository, MemberFormToMember memberConverter, MemberSkillService memberSkillService, MemberSkillRepository skillRepository) {
         this.memberRepository = memberRepository;
         this.memberConverter = memberConverter;
         this.memberSkillService = memberSkillService;
+        this.skillRepository = skillRepository;
     }
 
     @Override
@@ -59,6 +62,30 @@ public class MemberServiceImpl implements MemberService {
                 checkIfMainSkillPresent(skills.getSkills(), skills.getMainSkill(), member);
             }
             memberRepository.save(member);
+        }
+    }
+
+    @Override
+    public void deleteSkill(Long memberId, String skillName) {
+        Optional<Member> memberOptional = memberRepository.findById(memberId);
+        if (memberOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Member with the given ID does not exist.");
+        } else {
+            Optional<MemberSkill> skillOptional =memberOptional.get().getSkills().stream().filter(memberSkill ->
+                memberSkill.getSkill().getName().equals(skillName)
+            ).findFirst();
+            if(skillOptional.isEmpty()){
+                throw  new ResourceNotFoundException("Skill with the given name does not exist.");
+            } else {
+                MemberSkill skillToDelete = skillOptional.get();
+                Member member = memberOptional.get();
+                member.getSkills().remove(skillToDelete);
+                if(skillName.equals(member.getMainSkill().getName())){
+                    member.setMainSkill(null);
+                    memberRepository.save(member);
+                }
+                skillRepository.delete(skillToDelete);
+            }
         }
     }
 
