@@ -1,13 +1,16 @@
 package com.ag04.sbss.hackathon.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.util.Set;
-import java.util.logging.Level;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name="required_skill")
 public class RequiredSkill {
@@ -27,8 +30,8 @@ public class RequiredSkill {
 
     private Integer members;
 
-    @ManyToMany(mappedBy = "skills")
-    private Set<Heist> heists;
-
-
+    @ManyToOne
+    @EqualsAndHashCode.Exclude
+    @JsonIgnore
+    private Heist heist;
 }
