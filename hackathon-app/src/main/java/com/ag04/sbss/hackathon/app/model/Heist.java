@@ -1,6 +1,8 @@
 package com.ag04.sbss.hackathon.app.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.aspectj.apache.bcel.classfile.Module;
 import org.hibernate.annotations.Cascade;
 
@@ -8,7 +10,8 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name="heist")
 public class Heist {

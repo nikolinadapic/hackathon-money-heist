@@ -5,6 +5,7 @@ import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
 import com.ag04.sbss.hackathon.app.forms.HeistForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
+import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
 import com.ag04.sbss.hackathon.app.model.Heist;
 import com.ag04.sbss.hackathon.app.services.HeistService;
 import org.springframework.http.HttpHeaders;
@@ -54,5 +55,12 @@ public class HeistController {
     @GetMapping("/{heistId}/eligible_members")
     public ResponseEntity<EligibleMembersDTO> getEligibleMembers(@PathVariable("heistId") Long heistId) {
         return new ResponseEntity<>(heistService.getEligibleMembers(heistId), HttpStatus.OK);
+    }
+
+    @PutMapping("/{heistId}/members")
+    public ResponseEntity<String> setHeistMembers(@PathVariable("heistId") Long heistId, @RequestBody MemberNamesForm memberNames) {
+        heistService.addHeistMembers(heistId, memberNames);
+
+        return ResponseEntity.noContent().header("Content-Location", "/heist/" + heistId + "/members").build();
     }
 }
