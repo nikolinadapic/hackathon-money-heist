@@ -29,7 +29,7 @@ public class Member {
     private Set<MemberSkill> skills;
 
     @ManyToOne
-    private MemberSkill mainSkill;
+    private Skill mainSkill;
 
     @Enumerated(EnumType.STRING)
     private StatusMember status;
