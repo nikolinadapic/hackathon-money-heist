@@ -29,21 +29,32 @@ public class MemberServiceImpl implements MemberService {
     private final MemberSkillService memberSkillService;
     private final MemberSkillRepository skillRepository;
     private final MemberToMemberSkillListDTO skillListDTOConverter;
+    private final EmailService emailService;
 
 
-    public MemberServiceImpl(MemberRepository memberRepository, MemberFormToMember memberConverter, MemberToMemberDTO memberDTOConverter, MemberSkillService memberSkillService, MemberSkillRepository skillRepository, MemberToMemberSkillListDTO skillListDTOConverter) {
+    public MemberServiceImpl(MemberRepository memberRepository,
+                             MemberFormToMember memberConverter,
+                             MemberToMemberDTO memberDTOConverter,
+                             MemberSkillService memberSkillService,
+                             MemberSkillRepository skillRepository,
+                             MemberToMemberSkillListDTO skillListDTOConverter,
+                             EmailService emailService) {
         this.memberRepository = memberRepository;
         this.memberConverter = memberConverter;
         this.memberDTOConverter = memberDTOConverter;
         this.memberSkillService = memberSkillService;
         this.skillRepository = skillRepository;
         this.skillListDTOConverter = skillListDTOConverter;
+        this.emailService = emailService;
     }
 
     @Override
     public Member createMember(MemberDTO memberToCreate) {
         Member newMember = memberConverter.convert(memberToCreate);
         if (newMember != null) {
+            emailService.sendMessage("vitomir.marjanovic@fer.hr",
+                    "SECRET","Hello, "+ newMember.getName() + "! "+
+                    "You have been added to our special group. ");
             return memberRepository.save(newMember);
 
         } else {
