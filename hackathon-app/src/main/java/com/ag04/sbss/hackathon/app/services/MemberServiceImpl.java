@@ -52,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
     public Member createMember(MemberDTO memberToCreate) {
         Member newMember = memberConverter.convert(memberToCreate);
         if (newMember != null) {
-            emailService.sendMessage("vitomir.marjanovic@fer.hr",
+            emailService.sendMessage(newMember.getEmail(),
                     "SECRET","Hello, "+ newMember.getName() + "! "+
                     "You have been added to our special group. ");
             return memberRepository.save(newMember);

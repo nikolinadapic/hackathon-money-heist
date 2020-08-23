@@ -89,6 +89,7 @@ public class HeistServiceImpl implements HeistService {
         }
 
         heistOptional.get().setStatus(StatusHeist.IN_PROGRESS);
+        sendEmail(heistOptional.get());
 
         heistRepository.save(heistOptional.get());
     }
@@ -150,14 +151,7 @@ public class HeistServiceImpl implements HeistService {
 
         heistOptional.get().setMembers(members);
         heistOptional.get().setStatus(StatusHeist.READY);
-
-        for(Member heistMember : members) {
-            emailService.sendMessage(heistMember.getEmail(),
-                    "SECRET", "Hello, " + heistMember.getName() + "! " +
-                            "You have been confirmed to participate in a heist named '"
-                            + heistOptional.get().getName() + "'.");
-        }
-
+        sendEmail(heistOptional.get());
         heistRepository.save(heistOptional.get());
     }
 
@@ -243,5 +237,14 @@ public class HeistServiceImpl implements HeistService {
         }
 
         return true;
+    }
+
+    private void sendEmail(Heist heist){
+        for(Member heistMember : heist.getMembers() ) {
+            emailService.sendMessage(heistMember.getEmail(),
+                    "SECRET", "Hello, " + heistMember.getName() + "! " +
+                            "You have been confirmed to participate in a heist named '"
+                            + heist.getName() + "'.");
+        }
     }
 }
