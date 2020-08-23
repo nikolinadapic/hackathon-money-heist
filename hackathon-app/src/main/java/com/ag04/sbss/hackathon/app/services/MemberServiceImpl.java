@@ -2,16 +2,16 @@ package com.ag04.sbss.hackathon.app.services;
 
 import com.ag04.sbss.hackathon.app.converters.MemberFormToMember;
 import com.ag04.sbss.hackathon.app.converters.MemberToMemberDTO;
+import com.ag04.sbss.hackathon.app.converters.MemberToMemberSkillListDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberDTO;
-import com.ag04.sbss.hackathon.app.forms.MemberSkillForm;
-import com.ag04.sbss.hackathon.app.forms.MemberSkillListForm;
-import com.ag04.sbss.hackathon.app.model.Member;
-import com.ag04.sbss.hackathon.app.model.MemberSkill;
-import com.ag04.sbss.hackathon.app.model.Skill;
+import com.ag04.sbss.hackathon.app.forms.MemberSkillDTO;
+import com.ag04.sbss.hackathon.app.forms.MemberSkillListDTO;
+import com.ag04.sbss.hackathon.app.model.*;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
 import com.ag04.sbss.hackathon.app.repositories.MemberSkillRepository;
 import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.ag04.sbss.hackathon.app.services.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -24,23 +24,38 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberFormToMember memberConverter;
-    private final MemberToMemberDTO memberDTOconverter;
+    private final MemberToMemberDTO memberDTOConverter;
     private final MemberSkillService memberSkillService;
     private final MemberSkillRepository skillRepository;
+    private final MemberToMemberSkillListDTO skillListDTOConverter;
+    private final EmailService emailService;
+    @Value("${levelUpTime}")
+    private int LEVEL_UP_TIME;
 
-
-    public MemberServiceImpl(MemberRepository memberRepository, MemberFormToMember memberConverter, MemberToMemberDTO memberDTOconverter, MemberSkillService memberSkillService, MemberSkillRepository skillRepository) {
+    public MemberServiceImpl(MemberRepository memberRepository,
+                             MemberFormToMember memberConverter,
+                             MemberToMemberDTO memberDTOConverter,
+                             MemberSkillService memberSkillService,
+                             MemberSkillRepository skillRepository,
+                             MemberToMemberSkillListDTO skillListDTOConverter,
+                             EmailService emailService) {
         this.memberRepository = memberRepository;
         this.memberConverter = memberConverter;
-        this.memberDTOconverter = memberDTOconverter;
+        this.memberDTOConverter = memberDTOConverter;
         this.memberSkillService = memberSkillService;
         this.skillRepository = skillRepository;
+        this.skillListDTOConverter = skillListDTOConverter;
+        this.emailService = emailService;
     }
+
 
     @Override
     public Member createMember(MemberDTO memberToCreate) {
         Member newMember = memberConverter.convert(memberToCreate);
         if (newMember != null) {
+            emailService.sendMessage(newMember.getEmail(),
+                    "SECRET","Hello, "+ newMember.getName() + "! "+
+                    "You have been added to our special group. ");
             return memberRepository.save(newMember);
 
         } else {
@@ -49,7 +64,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateMemberSkills(Long memberId, MemberSkillListForm skills) {
+    public void updateMemberSkills(Long memberId, MemberSkillListDTO skills) {
         Optional<Member> memberOptional = memberRepository.findById(memberId);
         if (memberOptional.isEmpty()) {
             throw new ResourceNotFoundException("Member with the given ID does not exist.");
@@ -65,6 +80,30 @@ public class MemberServiceImpl implements MemberService {
                 checkIfMainSkillPresent(skills.getSkills(), skills.getMainSkill(), member);
             }
             memberRepository.save(member);
+        }
+    }
+
+    @Override
+    public void incrementSkills(Heist heist){
+        //calculate duration
+        long multiplicator = ((heist.getEndTime().getTime()-heist.getStartTime().getTime()) / 1000) % LEVEL_UP_TIME;
+        for(Member member : heist.getMembers()){
+            for(RequiredSkill requiredSkill : heist.getSkills()){
+                Optional<MemberSkill> skill =
+                        member.getSkills().stream().filter(memberSkill ->
+                        memberSkill.getSkill().equals(requiredSkill.getSkill()))
+                        .findFirst();
+                if(skill.isPresent()){
+                    MemberSkill memberSkill= skill.get();
+
+                    for(int i = 1;i<=multiplicator; i++){
+                        if(memberSkill.getLevel().length() <10){
+                            memberSkill.setLevel(memberSkill.getLevel()+"*");
+                        }
+                    }
+                }
+
+            }
         }
     }
 
@@ -99,10 +138,20 @@ public class MemberServiceImpl implements MemberService {
         if(memberOptional.isEmpty()){
             throw new ResourceNotFoundException("Member with the given ID does not exist.");
         }
-        return memberDTOconverter.convert(memberOptional.get());
+        return memberDTOConverter.convert(memberOptional.get());
     }
 
-    private void checkIfMainSkillPresent(List<MemberSkillForm> skills, String mainSkill, Member member) {
+    @Override
+    public MemberSkillListDTO findMemberSkills(Long memberId) {
+        Optional<Member> memberOptional = memberRepository.findById(memberId);
+
+        if(memberOptional.isEmpty()){
+            throw new ResourceNotFoundException("Member with the given Id does not exist.");
+        }
+        return skillListDTOConverter.convert(memberOptional.get());
+    }
+
+    private void checkIfMainSkillPresent(List<MemberSkillDTO> skills, String mainSkill, Member member) {
         Set<MemberSkill> mergedSkills;
         if (skills != null && !skills.isEmpty()) {
             mergedSkills = mergeSkillSets(memberSkillService.convertToSkillSet(skills),

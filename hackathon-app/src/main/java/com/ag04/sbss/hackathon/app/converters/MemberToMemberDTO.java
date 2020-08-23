@@ -1,7 +1,7 @@
 package com.ag04.sbss.hackathon.app.converters;
 
 import com.ag04.sbss.hackathon.app.forms.MemberDTO;
-import com.ag04.sbss.hackathon.app.forms.MemberSkillForm;
+import com.ag04.sbss.hackathon.app.forms.MemberSkillDTO;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
 import org.springframework.core.convert.converter.Converter;
@@ -16,9 +16,9 @@ import java.util.List;
 @Component
 public class MemberToMemberDTO implements Converter<Member, MemberDTO> {
 
-    private final MemberSkillToMemberSkillForm skillConverter;
+    private final MemberSkillToMemberSkillDTO skillConverter;
 
-    public MemberToMemberDTO(MemberSkillToMemberSkillForm skillConverter) {
+    public MemberToMemberDTO(MemberSkillToMemberSkillDTO skillConverter) {
         this.skillConverter = skillConverter;
     }
 
@@ -32,7 +32,7 @@ public class MemberToMemberDTO implements Converter<Member, MemberDTO> {
         memberDTO.setMainSkill(source.getMainSkill().getName());
         memberDTO.setStatus(source.getStatus());
 
-        List<MemberSkillForm> skills = new LinkedList<>();
+        List<MemberSkillDTO> skills = new LinkedList<>();
         for (MemberSkill skill : source.getSkills()){
             skills.add(skillConverter.convert(skill));
         }

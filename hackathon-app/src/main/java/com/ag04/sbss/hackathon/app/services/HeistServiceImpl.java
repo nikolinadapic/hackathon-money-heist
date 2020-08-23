@@ -30,9 +30,9 @@ public class HeistServiceImpl implements HeistService {
     private final MemberToHeistMemberDTO memberToHeistMemberDTO;
     private final HeistToHeistDTO heistToHeistDTO;
     private final RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm;
-    private final SchedulingService schedulingService;
+    private final EmailService emailService;
 
-    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm, SchedulingService schedulingService) {
+    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm, EmailService emailService) {
         this.heistRepository = heistRepository;
         this.requiredSkillListFormToRequiredSkillSet = requiredSkillListFormToRequiredSkillSet;
         this.requiredSkillService = requiredSkillService;
@@ -40,7 +40,7 @@ public class HeistServiceImpl implements HeistService {
         this.memberToHeistMemberDTO = memberToHeistMemberDTO;
         this.heistToHeistDTO = heistToHeistDTO;
         this.requiredSkillToRequiredSkillForm = requiredSkillToRequiredSkillForm;
-        this.schedulingService = schedulingService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -102,6 +102,7 @@ public class HeistServiceImpl implements HeistService {
         }
 
         heistOptional.get().setStatus(StatusHeist.IN_PROGRESS);
+        sendEmail(heistOptional.get());
 
         heistRepository.save(heistOptional.get());
     }
@@ -163,6 +164,7 @@ public class HeistServiceImpl implements HeistService {
 
         heistOptional.get().setMembers(members);
         heistOptional.get().setStatus(StatusHeist.READY);
+        sendEmail(heistOptional.get());
         heistRepository.save(heistOptional.get());
     }
 
@@ -282,141 +284,12 @@ public class HeistServiceImpl implements HeistService {
         return true;
     }
 
-    String calculateOutcome(Heist heist) {
-        Set<Member> availableMembers = new HashSet<>();
-        availableMembers.addAll(heist.getMembers());
-
-        System.out.println(heist.getMembers());
-        System.out.println(availableMembers);
-
-        int numMembers = 0;
-        int requiredNumMembers = 0;
-
-        TreeMap<RequiredSkill, Integer> mapping = new TreeMap<>(new Comparator<RequiredSkill>() {
-            public int compare(RequiredSkill lhs, RequiredSkill rhs) {
-                if (lhs.getLevel().contains(rhs.getLevel())) {
-                    return lhs.getLevel().equals(rhs.getLevel()) ? 0 : -1;
-                }
-
-                return 1;
-            }
-        });
-
-        for(RequiredSkill skill : heist.getSkills()) {
-            mapping.put(skill, 0);
-            requiredNumMembers = requiredNumMembers + skill.getMembers();
-        }
-
-        for(Entry<RequiredSkill, Integer> entry : mapping.entrySet()) {
-            System.out.println(entry.getKey().getSkill().getName());
-
-            List<Member> eligibleMembers = new LinkedList<>();
-
-            for(Member member : availableMembers) {
-                System.out.println(member.getName());
-                for(MemberSkill skill : member.getSkills()) {
-                    System.out.println("got " + skill.getSkill() + " " + skill.getLevel());
-                    System.out.println("required " + entry.getKey().getSkill() + "  " + entry.getKey().getLevel());
-                    if(skill.getSkill().equals(entry.getKey().getSkill())
-                            && skill.getLevel().contains(entry.getKey().getLevel())) {
-                        eligibleMembers.add(member);
-                    }
-                }
-            }
-
-            Comparator<Member> byRequiredSkillLevel = new Comparator<Member>() {
-                public int compare(Member lhs, Member rhs) {
-                    int lhsLevel = 0;
-                    for(MemberSkill skill : lhs.getSkills()) {
-                        if(skill.getSkill().equals(entry.getKey().getSkill())) {
-                            lhsLevel = skill.getLevel().length();
-                        }
-                    }
-
-                    int rhsLevel  = 0;
-                    for(MemberSkill skill : rhs.getSkills()) {
-                        if(skill.getSkill().equals(entry.getKey().getSkill())) {
-                            rhsLevel = skill.getLevel().length();
-                        }
-                    }
-
-
-                    if (lhsLevel > rhsLevel) {
-                        return lhsLevel == rhsLevel ? 0 : -1;
-                    }
-
-                    return 1;
-                }
-            };
-
-            Collections.sort(eligibleMembers, byRequiredSkillLevel);
-
-            System.out.println(eligibleMembers);
-
-            for(int i = 0; i < entry.getKey().getMembers(); ++i) {
-                if(i < eligibleMembers.size()) {
-                    entry.setValue(entry.getValue() + 1);
-                    availableMembers.remove(eligibleMembers.get(i));
-                    ++numMembers;
-                }
-            }
-        }
-
-        System.out.println(mapping);
-
-        double res = (double) numMembers / requiredNumMembers;
-
-        System.out.println("numMembers " + numMembers);
-        System.out.println("requiredNumMembers " + requiredNumMembers);
-        System.out.println(res);
-        if(res < 0.75) {
-            if(res < 0.5) {
-                changeMemberStatus(1, false, heist);
-                return "FAILED";
-            } else {
-                if(Math.random() < 0.5) {
-                    changeMemberStatus((double) 2 / 3, false, heist);
-                    return "FAILED";
-                }
-
-                changeMemberStatus((double) 1 / 3, false, heist);
-                return "SUCCEEDED";
-            }
-        }
-
-        if(numMembers == requiredNumMembers) {
-            return "SUCCEEDED";
-        }
-
-        changeMemberStatus((double) 1 / 3, true, heist);
-        return "SUCCEEDED";
-    }
-
-    private void changeMemberStatus(double howMany, boolean onlyIncarcerated, Heist heist) {
-        int num = (int) Math.ceil(howMany * heist.getMembers().size());
-
-        System.out.println(howMany);
-        System.out.println(heist.getMembers().size());
-        System.out.println("to change status " + num);
-
-        int i = 0;
-        for(Member member : heist.getMembers()) {
-            System.out.println(member);
-            if(++i > num) {
-                break;
-            }
-
-            if(onlyIncarcerated) {
-                member.setStatus(StatusMember.INCARCERATED);
-            } else {
-                if(Math.random() < 0.5) {
-                    member.setStatus(StatusMember.INCARCERATED);
-                } else {
-                    member.setStatus(StatusMember.EXPERIED);
-                }
-            }
-
-            memberRepository.save(member);
+    private void sendEmail(Heist heist){
+        for(Member heistMember : heist.getMembers() ) {
+            emailService.sendMessage(heistMember.getEmail(),
+                    "SECRET", "Hello, " + heistMember.getName() + "! " +
+                            "You have been confirmed to participate in a heist named '"
+                            + heist.getName() + "'.");
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.ag04.sbss.hackathon.app.dto;
 
-import com.ag04.sbss.hackathon.app.forms.MemberSkillForm;
+import com.ag04.sbss.hackathon.app.forms.MemberSkillDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,5 +14,5 @@ public class HeistMemberDTO {
 
     private String name;
 
-    private List<MemberSkillForm> skills;
+    private List<MemberSkillDTO> skills;
 }
