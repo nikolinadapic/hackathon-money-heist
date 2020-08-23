@@ -3,7 +3,6 @@ package com.ag04.sbss.hackathon.app.model;
 import com.ag04.sbss.hackathon.app.scheduling.ScheduledStatusChange;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import javax.persistence.*;
 import java.util.Date;
