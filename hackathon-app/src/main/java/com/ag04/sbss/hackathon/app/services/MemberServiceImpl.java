@@ -6,13 +6,12 @@ import com.ag04.sbss.hackathon.app.converters.MemberToMemberSkillListDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberSkillDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberSkillListDTO;
-import com.ag04.sbss.hackathon.app.model.Member;
-import com.ag04.sbss.hackathon.app.model.MemberSkill;
-import com.ag04.sbss.hackathon.app.model.Skill;
+import com.ag04.sbss.hackathon.app.model.*;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
 import com.ag04.sbss.hackathon.app.repositories.MemberSkillRepository;
 import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.ag04.sbss.hackathon.app.services.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -30,7 +29,8 @@ public class MemberServiceImpl implements MemberService {
     private final MemberSkillRepository skillRepository;
     private final MemberToMemberSkillListDTO skillListDTOConverter;
     private final EmailService emailService;
-
+    @Value("${levelUpTime}")
+    private int LEVEL_UP_TIME;
 
     public MemberServiceImpl(MemberRepository memberRepository,
                              MemberFormToMember memberConverter,
@@ -47,6 +47,7 @@ public class MemberServiceImpl implements MemberService {
         this.skillListDTOConverter = skillListDTOConverter;
         this.emailService = emailService;
     }
+
 
     @Override
     public Member createMember(MemberDTO memberToCreate) {
@@ -79,6 +80,30 @@ public class MemberServiceImpl implements MemberService {
                 checkIfMainSkillPresent(skills.getSkills(), skills.getMainSkill(), member);
             }
             memberRepository.save(member);
+        }
+    }
+
+    @Override
+    public void incrementSkills(Heist heist){
+        //calculate duration
+        long multiplicator = ((heist.getEndTime().getTime()-heist.getStartTime().getTime()) / 1000) % LEVEL_UP_TIME;
+        for(Member member : heist.getMembers()){
+            for(RequiredSkill requiredSkill : heist.getSkills()){
+                Optional<MemberSkill> skill =
+                        member.getSkills().stream().filter(memberSkill ->
+                        memberSkill.getSkill().equals(requiredSkill.getSkill()))
+                        .findFirst();
+                if(skill.isPresent()){
+                    MemberSkill memberSkill= skill.get();
+
+                    for(int i = 1;i<=multiplicator; i++){
+                        if(memberSkill.getLevel().length() <10){
+                            memberSkill.setLevel(memberSkill.getLevel()+"*");
+                        }
+                    }
+                }
+
+            }
         }
     }
 
