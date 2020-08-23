@@ -15,7 +15,6 @@ import com.ag04.sbss.hackathon.app.scheduling.ScheduledStatusChange;
 import com.ag04.sbss.hackathon.app.services.exception.MethodNotAllowedException;
 import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.ag04.sbss.hackathon.app.services.exception.ResourceNotFoundException;
-import java.util.Map.Entry;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,9 +31,10 @@ public class HeistServiceImpl implements HeistService {
     private final RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm;
     private final EmailService emailService;
     private final SchedulingService schedulingService;
+    private final MemberService memberService;
 
 
-    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm, EmailService emailService, SchedulingService schedulingService) {
+    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm, EmailService emailService, SchedulingService schedulingService, MemberService memberService) {
         this.heistRepository = heistRepository;
         this.requiredSkillListFormToRequiredSkillSet = requiredSkillListFormToRequiredSkillSet;
         this.requiredSkillService = requiredSkillService;
@@ -44,6 +44,7 @@ public class HeistServiceImpl implements HeistService {
         this.requiredSkillToRequiredSkillForm = requiredSkillToRequiredSkillForm;
         this.emailService = emailService;
         this.schedulingService = schedulingService;
+        this.memberService = memberService;
     }
 
     @Override
@@ -60,15 +61,17 @@ public class HeistServiceImpl implements HeistService {
 
         if(heist.getStartTime().getTime() - System.currentTimeMillis() <= 0) {
             heist.setStatus(StatusHeist.IN_PROGRESS);
+            sendEmail(heist);
+
         } else {
             schedulingService.getScheduler().schedule(
-                    new ScheduledStatusChange(heist.getName(), StatusHeist.IN_PROGRESS, heistRepository),
+                    new ScheduledStatusChange(heist.getName(), StatusHeist.IN_PROGRESS, heistRepository,emailService,memberService),
                     new Date(heist.getStartTime().getTime())
             );
         }
 
         schedulingService.getScheduler().schedule(
-                new ScheduledStatusChange(heist.getName(), StatusHeist.FINISHED, heistRepository),
+                new ScheduledStatusChange(heist.getName(), StatusHeist.FINISHED, heistRepository,emailService,memberService),
                 new Date(heist.getEndTime().getTime())
         );
 

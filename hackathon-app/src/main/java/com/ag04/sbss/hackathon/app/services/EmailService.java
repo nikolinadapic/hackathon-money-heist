@@ -6,4 +6,5 @@ package com.ag04.sbss.hackathon.app.services;
 public interface EmailService {
 
     void sendMessage(String to, String subject, String text);
+
 }
