@@ -51,6 +51,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member createMember(MemberDTO memberToCreate) {
+        Optional<Member> memberOptional = memberRepository.findByEmail(memberToCreate.getEmail());
+
+        if(memberOptional.isPresent()) {
+            throw new RequestDeniedException("Member with same email already exists.");
+        }
+
         Member newMember = memberConverter.convert(memberToCreate);
         if (newMember != null) {
             emailService.sendMessage(newMember.getEmail(),

@@ -2,11 +2,14 @@ package com.ag04.sbss.hackathon.app.controllers;
 
 import com.ag04.sbss.hackathon.app.forms.MemberDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberSkillListDTO;
+import com.ag04.sbss.hackathon.app.model.Heist;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.services.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -31,9 +34,12 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<Member> createMember(@RequestBody MemberDTO newMember){
+    public ResponseEntity<String> createMember(@RequestBody MemberDTO newMember){
         Member created = memberService.createMember(newMember);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+
+        URI location = URI.create(String.format("/member/%s", created.getId()));
+
+        return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/{memberId}/skills")
