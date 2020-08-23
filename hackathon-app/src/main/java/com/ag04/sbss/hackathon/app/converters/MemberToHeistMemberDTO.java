@@ -1,7 +1,7 @@
 package com.ag04.sbss.hackathon.app.converters;
 
 import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
-import com.ag04.sbss.hackathon.app.forms.MemberSkillForm;
+import com.ag04.sbss.hackathon.app.forms.MemberSkillDTO;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
 import org.springframework.core.convert.converter.Converter;
@@ -13,10 +13,10 @@ import java.util.List;
 @Component
 public class MemberToHeistMemberDTO implements Converter<Member, HeistMemberDTO> {
 
-    private final MemberSkillToMemberSkillForm memberSkillToMemberSkillForm;
+    private final MemberSkillToMemberSkillDTO memberSkillToMemberSkillDTO;
 
-    public MemberToHeistMemberDTO(MemberSkillToMemberSkillForm memberSkillToMemberSkillForm) {
-        this.memberSkillToMemberSkillForm = memberSkillToMemberSkillForm;
+    public MemberToHeistMemberDTO(MemberSkillToMemberSkillDTO memberSkillToMemberSkillDTO) {
+        this.memberSkillToMemberSkillDTO = memberSkillToMemberSkillDTO;
     }
 
     @Override
@@ -25,10 +25,10 @@ public class MemberToHeistMemberDTO implements Converter<Member, HeistMemberDTO>
 
         heistMemberDTO.setName(source.getName());
 
-        List<MemberSkillForm> skillFormList = new ArrayList<>();
+        List<MemberSkillDTO> skillFormList = new ArrayList<>();
 
         for(MemberSkill skill : source.getSkills()) {
-            skillFormList.add(memberSkillToMemberSkillForm.convert(skill));
+            skillFormList.add(memberSkillToMemberSkillDTO.convert(skill));
         }
 
         heistMemberDTO.setSkills(skillFormList);

@@ -1,7 +1,7 @@
 package com.ag04.sbss.hackathon.app.services;
 
 import com.ag04.sbss.hackathon.app.converters.MemberSkillFormToMemberSkill;
-import com.ag04.sbss.hackathon.app.forms.MemberSkillForm;
+import com.ag04.sbss.hackathon.app.forms.MemberSkillDTO;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
 import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import org.springframework.stereotype.Service;
@@ -23,9 +23,9 @@ public class MemberSkillServiceImpl implements MemberSkillService {
     }
 
     @Override
-    public Set<MemberSkill> convertToSkillSet(List<MemberSkillForm> forms) {
+    public Set<MemberSkill> convertToSkillSet(List<MemberSkillDTO> forms) {
         Set<MemberSkill> skills = new HashSet<>();
-        for(MemberSkillForm skillForm : forms){
+        for(MemberSkillDTO skillForm : forms){
             MemberSkill memberSkill = memberSkillConverter.convert(skillForm);
 
             for(MemberSkill memSkill : skills){

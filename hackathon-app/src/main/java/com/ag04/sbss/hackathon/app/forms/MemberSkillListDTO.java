@@ -4,14 +4,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Created by Vitomir M on 22.8.2020.
  */
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberSkillForm {
+public class MemberSkillListDTO {
 
-    private String name;
-    private String level;
+    private List<MemberSkillDTO> skills;
+
+    private String mainSkill;
+
 }

@@ -1,8 +1,6 @@
 package com.ag04.sbss.hackathon.app.forms;
 
-import com.ag04.sbss.hackathon.app.model.MemberSkill;
 import com.ag04.sbss.hackathon.app.model.Sex;
-import com.ag04.sbss.hackathon.app.model.Skill;
 import com.ag04.sbss.hackathon.app.model.StatusMember;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +29,7 @@ public class MemberDTO {
         private String email;
 
         @NotNull
-        private List<MemberSkillForm> skills;
+        private List<MemberSkillDTO> skills;
 
         private String mainSkill;
 
