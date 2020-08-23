@@ -4,21 +4,26 @@ import com.ag04.sbss.hackathon.app.model.Heist;
 import com.ag04.sbss.hackathon.app.model.StatusHeist;
 import com.ag04.sbss.hackathon.app.repositories.HeistRepository;
 
+import java.util.Optional;
+
 public class ScheduledStatusChange implements Runnable {
-    private Heist heist;
+    private String heistName;
     private StatusHeist newStatus;
     private HeistRepository heistRepository;
 
-    public ScheduledStatusChange(Heist heist, StatusHeist newStatus, HeistRepository heistRepository){
-        this.heist = heist;
+    public ScheduledStatusChange(String heistName, StatusHeist newStatus, HeistRepository heistRepository){
+        this.heistName = heistName;
         this.newStatus = newStatus;
         this.heistRepository = heistRepository;
     }
 
     @Override
     public void run() {
-        heist.setStatus(newStatus);
+        Optional<Heist> heistOptional = heistRepository.findByName(heistName);
 
-        heistRepository.save(heist);
+        if(heistOptional.isPresent()) {
+            heistOptional.get().setStatus(newStatus);
+            heistRepository.save(heistOptional.get());
+        }
     }
 }

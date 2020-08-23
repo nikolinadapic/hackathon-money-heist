@@ -1,9 +1,6 @@
 package com.ag04.sbss.hackathon.app.services;
 
-import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
-import com.ag04.sbss.hackathon.app.dto.HeistDTO;
-import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
-import com.ag04.sbss.hackathon.app.dto.StatusDTO;
+import com.ag04.sbss.hackathon.app.dto.*;
 import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
@@ -29,4 +26,6 @@ public interface HeistService {
     List<RequiredSkillForm> findHeistSkills(Long heistId);
 
     StatusDTO findHeistStatus(Long heistId);
+
+    OutcomeDTO getHeistOutcome(Long heistId);
 }
