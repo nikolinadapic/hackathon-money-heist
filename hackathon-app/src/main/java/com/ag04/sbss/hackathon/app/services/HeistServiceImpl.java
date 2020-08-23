@@ -5,8 +5,8 @@ import com.ag04.sbss.hackathon.app.converters.MemberToHeistMemberDTO;
 import com.ag04.sbss.hackathon.app.converters.RequiredSkillListFormToRequiredSkillSet;
 import com.ag04.sbss.hackathon.app.converters.RequiredSkillToRequiredSkillForm;
 import com.ag04.sbss.hackathon.app.dto.EligibleMembersDTO;
-import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
 import com.ag04.sbss.hackathon.app.dto.HeistDTO;
+import com.ag04.sbss.hackathon.app.dto.HeistMemberDTO;
 import com.ag04.sbss.hackathon.app.dto.StatusDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
 import com.ag04.sbss.hackathon.app.forms.RequiredSkillForm;
@@ -31,8 +31,9 @@ public class HeistServiceImpl implements HeistService {
     private final MemberToHeistMemberDTO memberToHeistMemberDTO;
     private final HeistToHeistDTO heistToHeistDTO;
     private final RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm;
+    private final EmailService emailService;
 
-    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm) {
+    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm, EmailService emailService) {
         this.heistRepository = heistRepository;
         this.requiredSkillListFormToRequiredSkillSet = requiredSkillListFormToRequiredSkillSet;
         this.requiredSkillService = requiredSkillService;
@@ -40,6 +41,7 @@ public class HeistServiceImpl implements HeistService {
         this.memberToHeistMemberDTO = memberToHeistMemberDTO;
         this.heistToHeistDTO = heistToHeistDTO;
         this.requiredSkillToRequiredSkillForm = requiredSkillToRequiredSkillForm;
+        this.emailService = emailService;
     }
 
     @Override
@@ -148,6 +150,14 @@ public class HeistServiceImpl implements HeistService {
 
         heistOptional.get().setMembers(members);
         heistOptional.get().setStatus(StatusHeist.READY);
+
+        for(Member heistMember : members) {
+            emailService.sendMessage(heistMember.getEmail(),
+                    "SECRET", "Hello, " + heistMember.getName() + "! " +
+                            "You have been confirmed to participate in a heist named '"
+                            + heistOptional.get().getName() + "'.");
+        }
+
         heistRepository.save(heistOptional.get());
     }
 
