@@ -245,7 +245,6 @@ public class HeistServiceImpl implements HeistService {
             throw new MethodNotAllowedException("Heist status is not FINISHED.");
         }
 
-        System.out.println(heistOptional.get().getMembers());
         return new OutcomeDTO(calculateOutcome(heistOptional.get()));
     }
 
@@ -294,9 +293,6 @@ public class HeistServiceImpl implements HeistService {
         Set<Member> availableMembers = new HashSet<>();
         availableMembers.addAll(heist.getMembers());
 
-        System.out.println(heist.getMembers());
-        System.out.println(availableMembers);
-
         int numMembers = 0;
         int requiredNumMembers = 0;
 
@@ -316,15 +312,10 @@ public class HeistServiceImpl implements HeistService {
         }
 
         for(Map.Entry<RequiredSkill, Integer> entry : mapping.entrySet()) {
-            System.out.println(entry.getKey().getSkill().getName());
-
             List<Member> eligibleMembers = new LinkedList<>();
 
             for(Member member : availableMembers) {
-                System.out.println(member.getName());
                 for(MemberSkill skill : member.getSkills()) {
-                    System.out.println("got " + skill.getSkill() + " " + skill.getLevel());
-                    System.out.println("required " + entry.getKey().getSkill() + "  " + entry.getKey().getLevel());
                     if(skill.getSkill().equals(entry.getKey().getSkill())
                             && skill.getLevel().contains(entry.getKey().getLevel())) {
                         eligibleMembers.add(member);
@@ -359,8 +350,6 @@ public class HeistServiceImpl implements HeistService {
 
             Collections.sort(eligibleMembers, byRequiredSkillLevel);
 
-            System.out.println(eligibleMembers);
-
             for(int i = 0; i < entry.getKey().getMembers(); ++i) {
                 if(i < eligibleMembers.size()) {
                     entry.setValue(entry.getValue() + 1);
@@ -370,13 +359,8 @@ public class HeistServiceImpl implements HeistService {
             }
         }
 
-        System.out.println(mapping);
-
         double res = (double) numMembers / requiredNumMembers;
 
-        System.out.println("numMembers " + numMembers);
-        System.out.println("requiredNumMembers " + requiredNumMembers);
-        System.out.println(res);
         if(res < 0.75) {
             if(res < 0.5) {
                 changeMemberStatus(1, false, heist);
@@ -403,13 +387,8 @@ public class HeistServiceImpl implements HeistService {
     private void changeMemberStatus(double howMany, boolean onlyIncarcerated, Heist heist) {
         int num = (int) Math.ceil(howMany * heist.getMembers().size());
 
-        System.out.println(howMany);
-        System.out.println(heist.getMembers().size());
-        System.out.println("to change status " + num);
-
         int i = 0;
         for(Member member : heist.getMembers()) {
-            System.out.println(member);
             if(++i > num) {
                 break;
             }

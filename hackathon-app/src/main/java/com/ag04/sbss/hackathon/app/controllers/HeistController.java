@@ -8,7 +8,6 @@ import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.forms.MemberNamesForm;
 import com.ag04.sbss.hackathon.app.model.Heist;
 import com.ag04.sbss.hackathon.app.services.HeistService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/heist")
 public class HeistController {

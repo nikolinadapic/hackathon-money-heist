@@ -23,13 +23,13 @@ public class Heist {
     private Date startTime;
     private Date endTime;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "heist")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "heist", fetch = FetchType.EAGER)
     private Set<RequiredSkill> skills;
 
     @Enumerated(EnumType.STRING)
     private StatusHeist status;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "heist_member",
             joinColumns = @JoinColumn(name = "heist_id"),
             inverseJoinColumns = @JoinColumn(name = "member_id"))
