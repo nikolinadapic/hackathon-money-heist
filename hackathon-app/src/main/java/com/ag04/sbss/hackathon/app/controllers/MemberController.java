@@ -1,6 +1,7 @@
 package com.ag04.sbss.hackathon.app.controllers;
 
-import com.ag04.sbss.hackathon.app.forms.MemberForm;
+import com.ag04.sbss.hackathon.app.converters.MemberToMemberDTO;
+import com.ag04.sbss.hackathon.app.forms.MemberDTO;
 import com.ag04.sbss.hackathon.app.forms.MemberSkillListForm;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.services.MemberService;
@@ -18,8 +19,14 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+
+    @GetMapping("/{id}")
+    private ResponseEntity<MemberDTO> getMember(@PathVariable Long id){
+        return new ResponseEntity<>(memberService.findById(id), HttpStatus.OK);
+    }
+
     @PostMapping
-    private ResponseEntity<Member> createMember(@RequestBody MemberForm newMember){
+    private ResponseEntity<Member> createMember(@RequestBody MemberDTO newMember){
         Member created = memberService.createMember(newMember);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }

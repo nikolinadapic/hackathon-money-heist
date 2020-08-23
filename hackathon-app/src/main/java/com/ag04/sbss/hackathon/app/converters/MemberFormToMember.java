@@ -1,6 +1,6 @@
 package com.ag04.sbss.hackathon.app.converters;
 
-import com.ag04.sbss.hackathon.app.forms.MemberForm;
+import com.ag04.sbss.hackathon.app.forms.MemberDTO;
 import com.ag04.sbss.hackathon.app.model.Member;
 import com.ag04.sbss.hackathon.app.model.MemberSkill;
 import com.ag04.sbss.hackathon.app.model.Skill;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class MemberFormToMember implements Converter<MemberForm, Member> {
+public class MemberFormToMember implements Converter<MemberDTO, Member> {
     private MemberRepository memberRepository;
     private SkillRepository skillRepository;
     private MemberSkillFormToMemberSkill skillConverter;
@@ -35,7 +35,7 @@ public class MemberFormToMember implements Converter<MemberForm, Member> {
     @Synchronized
     @Nullable
     @Override
-    public Member convert(MemberForm source) {
+    public Member convert(MemberDTO source) {
         Member converted = new Member();
         //check for the existing name
         Optional<Member> memberByNameOptional = memberRepository.findByName(source.getName());

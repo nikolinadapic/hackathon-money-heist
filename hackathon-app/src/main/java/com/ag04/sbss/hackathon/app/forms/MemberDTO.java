@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberForm {
+public class MemberDTO {
 
         @NotBlank
         private String name;
