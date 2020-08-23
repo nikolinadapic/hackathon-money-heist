@@ -14,6 +14,7 @@ import com.ag04.sbss.hackathon.app.forms.RequiredSkillListForm;
 import com.ag04.sbss.hackathon.app.model.*;
 import com.ag04.sbss.hackathon.app.repositories.HeistRepository;
 import com.ag04.sbss.hackathon.app.repositories.MemberRepository;
+import com.ag04.sbss.hackathon.app.scheduling.ScheduledStatusChange;
 import com.ag04.sbss.hackathon.app.services.exception.MethodNotAllowedException;
 import com.ag04.sbss.hackathon.app.services.exception.RequestDeniedException;
 import com.ag04.sbss.hackathon.app.services.exception.ResourceNotFoundException;
@@ -31,8 +32,9 @@ public class HeistServiceImpl implements HeistService {
     private final MemberToHeistMemberDTO memberToHeistMemberDTO;
     private final HeistToHeistDTO heistToHeistDTO;
     private final RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm;
+    private final SchedulingService schedulingService;
 
-    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm) {
+    public HeistServiceImpl(HeistRepository heistRepository, RequiredSkillListFormToRequiredSkillSet requiredSkillListFormToRequiredSkillSet, RequiredSkillService requiredSkillService, MemberRepository memberRepository, MemberToHeistMemberDTO memberToHeistMemberDTO, HeistToHeistDTO heistToHeistDTO, RequiredSkillToRequiredSkillForm requiredSkillToRequiredSkillForm, SchedulingService schedulingService) {
         this.heistRepository = heistRepository;
         this.requiredSkillListFormToRequiredSkillSet = requiredSkillListFormToRequiredSkillSet;
         this.requiredSkillService = requiredSkillService;
@@ -40,6 +42,7 @@ public class HeistServiceImpl implements HeistService {
         this.memberToHeistMemberDTO = memberToHeistMemberDTO;
         this.heistToHeistDTO = heistToHeistDTO;
         this.requiredSkillToRequiredSkillForm = requiredSkillToRequiredSkillForm;
+        this.schedulingService = schedulingService;
     }
 
     @Override
@@ -53,6 +56,20 @@ public class HeistServiceImpl implements HeistService {
         if(heist.getStartTime().after(heist.getEndTime()) || heist.getEndTime().before(new Date(System.currentTimeMillis()))) {
             throw new MethodNotAllowedException("Invalid date.");
         }
+
+        if(heist.getStartTime().getTime() - System.currentTimeMillis() <= 0) {
+            heist.setStatus(StatusHeist.IN_PROGRESS);
+        } else {
+            schedulingService.getScheduler().schedule(
+                    new ScheduledStatusChange(heist, StatusHeist.IN_PROGRESS, heistRepository),
+                    new Date(heist.getStartTime().getTime())
+            );
+        }
+
+        schedulingService.getScheduler().schedule(
+                new ScheduledStatusChange(heist, StatusHeist.FINISHED, heistRepository),
+                new Date(heist.getEndTime().getTime())
+        );
 
         heistRepository.save(heist);
     }

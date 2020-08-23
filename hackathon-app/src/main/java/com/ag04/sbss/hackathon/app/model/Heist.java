@@ -1,5 +1,6 @@
 package com.ag04.sbss.hackathon.app.model;
 
+import com.ag04.sbss.hackathon.app.scheduling.ScheduledStatusChange;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -41,41 +42,5 @@ public class Heist {
         for(RequiredSkill skill : skills) {
             skill.setHeist(this);
         }
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.initialize();
-
-        long milis = startTime.getTime() - System.currentTimeMillis();
-
-        System.out.println("start in " + milis);
-
-        if(milis <= 0) {
-            status = StatusHeist.IN_PROGRESS;
-        }
-
-        scheduler.schedule(
-                new ScheduledStatusChange(this, StatusHeist.IN_PROGRESS),
-                new Date(startTime.getTime())
-        );
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.initialize();
-
-        long milis = endTime.getTime() - System.currentTimeMillis();
-
-        System.out.println("end in " + milis);
-
-        scheduler.schedule(
-                new ScheduledStatusChange(this, StatusHeist.FINISHED),
-                new Date(endTime.getTime())
-        );
     }
 }
